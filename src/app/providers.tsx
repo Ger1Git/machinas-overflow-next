@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SessionProvider } from 'next-auth/react';
 import { type ReactNode, useState } from 'react';
 import { type Session } from 'next-auth';
-import { BrowserRouter } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 
 export function Providers({
     children,
@@ -18,7 +18,8 @@ export function Providers({
     return (
         <SessionProvider session={session}>
             <QueryClientProvider client={queryClient}>
-                <BrowserRouter>{children}</BrowserRouter>
+                {children}
+                <Toaster />
             </QueryClientProvider>
         </SessionProvider>
     );

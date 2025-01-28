@@ -1,78 +1,65 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useMutation } from '@tanstack/react-query';
-import axios, { AxiosError } from 'axios';
+import { signIn, useSession } from 'next-auth/react';
+import Image from 'next/image';
 import toast from 'react-hot-toast';
 import Input from '../components/input/Input';
 
 const LoginPage = () => {
     const [usernameOrEmail, setUsernameOrEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [isClient, setIsClient] = useState(false);
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-    const [focusOn, setFocusOn] = useState<
-        null | 'usernameOrEmail' | 'password'
-    >(null);
-    const router = useRouter();
-
     const usernameOrEmailRef = useRef<HTMLInputElement>(null);
     const passwordRef = useRef<HTMLInputElement>(null);
 
-    const { mutate: handleLogin, status } = useMutation({
-        mutationKey: ['login'],
-        mutationFn: async () => {
-            try {
-                const response = await axios.post('/api/auth/login', {
-                    usernameOrEmail,
-                    password
-                });
+    const router = useRouter();
+    const { status } = useSession();
 
-                return response.data;
-            } catch (error: unknown) {
-                if (error instanceof AxiosError) {
-                    const errorMessage: string =
-                        error.response?.data?.message ||
-                        'Login failed. Please try again.';
+    const isLoading = status === 'loading';
+    const isAuthenticated = status === 'authenticated';
 
-                    toast.error(errorMessage);
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
-                    switch (true) {
-                        case errorMessage?.includes('Username or email'):
-                            setFocusOn('usernameOrEmail');
-                            usernameOrEmailRef.current?.focus();
-                            break;
-                        case errorMessage?.includes('Password'):
-                            setFocusOn('password');
-                            passwordRef.current?.focus();
-                            break;
-                        default:
-                            break;
-                    }
-                } else {
-                    toast.error('Login failed. Please try again.');
-                }
-            }
-        },
-        onSuccess: () => {
-            toast.success('Login successful!');
+    useEffect(() => {
+        if (status === 'authenticated') {
             router.push('/');
         }
-    });
+    }, [status, router]);
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        handleLogin();
+        const result = await signIn('credentials', {
+            redirect: false,
+            usernameOrEmail,
+            password
+        });
+
+        if (result?.error) {
+            toast.error('Invalid email or password. Please try again.');
+        } else {
+            router.push('/');
+        }
     };
 
-    const togglePasswordVisibility = () => {
-        setIsPasswordVisible(!isPasswordVisible);
-    };
+    if (!isClient) {
+        return null;
+    }
 
-    const isInputInvalid = (field: string) => focusOn === field;
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+
+    if (isAuthenticated) {
+        return null;
+    }
 
     return (
-        <div className="flex flex-1 items-center justify-center p-5 bg-gray-100">
+        <div className="flex flex-1 items-center justify-center px-5 py-7 bg-gray-100">
             <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
                 <h2 className="text-2xl font-semibold mb-6 text-center text-gray-800">
                     Login
@@ -85,11 +72,6 @@ const LoginPage = () => {
                         value={usernameOrEmail}
                         onChange={(e) => setUsernameOrEmail(e.target.value)}
                         placeholder="Enter your username or email"
-                        error={
-                            isInputInvalid('usernameOrEmail')
-                                ? 'Invalid username or email'
-                                : null
-                        }
                         ref={usernameOrEmailRef}
                     />
 
@@ -101,19 +83,16 @@ const LoginPage = () => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Your password"
-                            error={
-                                isInputInvalid('password')
-                                    ? 'Invalid password'
-                                    : null
-                            }
                             ref={passwordRef}
                         />
                         <button
                             type="button"
-                            onClick={togglePasswordVisibility}
+                            onClick={() =>
+                                setIsPasswordVisible((prev) => !prev)
+                            }
                             className="absolute bottom-[13px] right-3 bg-transparent border-none cursor-pointer"
                         >
-                            <img
+                            <Image
                                 src={
                                     isPasswordVisible
                                         ? '/hidePassword.svg'
@@ -124,17 +103,19 @@ const LoginPage = () => {
                                         ? 'Hide Password'
                                         : 'Show Password'
                                 }
-                                className="password-icon h-6 w-6 object-cover"
+                                width={24}
+                                height={24}
+                                className="object-cover"
                             />
                         </button>
                     </div>
 
                     <button
                         type="submit"
-                        disabled={status === 'pending'}
+                        disabled={isLoading}
                         className="w-full py-3 mt-4 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                        {status === 'pending' ? 'Logging in...' : 'Login'}
+                        {isAuthenticated ? 'Logging in...' : 'Login'}
                     </button>
                 </form>
 

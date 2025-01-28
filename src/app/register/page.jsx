@@ -1,7 +1,10 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { signIn, useSession } from 'next-auth/react';
+import Image from 'next/image';
 import axios from 'axios';
 import { useMutation } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
@@ -15,14 +18,21 @@ const RegisterPage = () => {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [focusOn, setFocusOn] = useState(null);
     const router = useRouter();
+    const { data: session, status } = useSession();
 
     const nameRef = useRef(null);
     const usernameRef = useRef(null);
     const emailRef = useRef(null);
     const passwordRef = useRef(null);
 
+    useEffect(() => {
+        if (status === 'authenticated') {
+            router.push('/');
+        }
+    }, [status, router]);
+
     const { mutate: handleRegister, isLoading } = useMutation({
-        mutationKey: 'register',
+        mutationKey: ['register'],
         mutationFn: async () => {
             try {
                 const response = await axios.post('/api/auth/register', {
@@ -86,11 +96,18 @@ const RegisterPage = () => {
         setIsPasswordVisible(!isPasswordVisible);
     };
 
-    // Helper function to determine if the input is invalid
     const isInputInvalid = (field) => focusOn === field;
 
+    if (status === 'loading') {
+        return <div>Loading...</div>;
+    }
+
+    if (status === 'authenticated') {
+        return null;
+    }
+
     return (
-        <div className="flex flex-1 items-center justify-center p-5 bg-gray-100">
+        <div className="flex flex-1 items-center justify-center px-5 py-7 bg-gray-100">
             <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
                 <h2 className="text-2xl font-semibold mb-6 text-center text-gray-800">
                     Register
@@ -155,7 +172,7 @@ const RegisterPage = () => {
                             onClick={togglePasswordVisibility}
                             className="absolute bottom-[13px] right-3 bg-transparent border-none cursor-pointer"
                         >
-                            <img
+                            <Image
                                 src={
                                     isPasswordVisible
                                         ? '/hidePassword.svg'
@@ -166,7 +183,9 @@ const RegisterPage = () => {
                                         ? 'Hide Password'
                                         : 'Show Password'
                                 }
-                                className="password-icon h-6 w-6 object-cover"
+                                width={24}
+                                height={24}
+                                className="object-cover"
                             />
                         </button>
                     </div>
@@ -180,13 +199,13 @@ const RegisterPage = () => {
                 </form>
 
                 <p className="mt-4 text-center text-sm text-gray-600">
-                    Already have an account?{' '}
-                    <a
+                    Already have an account?
+                    <Link
                         href="/login"
-                        className="text-blue-500 hover:text-blue-600"
+                        className="text-blue-500 hover:text-blue-600 ml-1"
                     >
                         Login
-                    </a>
+                    </Link>
                 </p>
             </div>
         </div>

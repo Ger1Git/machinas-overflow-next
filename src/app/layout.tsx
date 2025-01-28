@@ -5,7 +5,6 @@ import { authOptions } from './lib/auth';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { Providers } from './providers';
-import { Toaster } from 'react-hot-toast';
 import './globals.css';
 
 const geistSans = Geist({
@@ -39,7 +38,6 @@ export default async function RootLayout({
                     <Navbar />
                     <main className="flex-1 flex">{children}</main>
                     <Footer />
-                    <Toaster />
                 </Providers>
             </body>
         </html>

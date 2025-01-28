@@ -8,9 +8,7 @@ import { navbarLinks } from '../utils/navbarLinks';
 const Navbar = () => {
     const [menuOpen, setMenuOpen] = useState<boolean>(false);
 
-    const handleLogout = () => {
-        console.log('Logout clicked');
-    };
+    const handleLogout = () => {};
 
     return (
         <div>
@@ -33,27 +31,14 @@ const Navbar = () => {
 
                 <button
                     onClick={() => setMenuOpen((prevState) => !prevState)}
-                    className="sm:hidden text-white"
+                    className="block md:hidden text-white"
                     aria-label="Toggle Menu"
                 >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        className="h-8 w-8"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M4 6h16M4 12h16M4 18h16"
-                        />
-                    </svg>
+                    <Image src="/menu.svg" alt="Menu" width={40} height={40} />
                 </button>
             </div>
 
-            <div>
+            <div className="block md:hidden">
                 {menuOpen && (
                     <div
                         className="fixed inset-0 bg-black opacity-50 z-10"
