@@ -90,7 +90,7 @@ const RegisterPage = () => {
     const isInputInvalid = (field) => focusOn === field;
 
     return (
-        <div className="flex flex-1 items-center justify-center py-5 bg-gray-100">
+        <div className="flex flex-1 items-center justify-center p-5 bg-gray-100">
             <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
                 <h2 className="text-2xl font-semibold mb-6 text-center text-gray-800">
                     Register
@@ -135,7 +135,7 @@ const RegisterPage = () => {
                         ref={emailRef}
                     />
 
-                    <div className="password-input-container relative">
+                    <div className="relative">
                         <Input
                             type={isPasswordVisible ? 'text' : 'password'}
                             id="password"
@@ -153,7 +153,7 @@ const RegisterPage = () => {
                         <button
                             type="button"
                             onClick={togglePasswordVisibility}
-                            className="password-toggle-btn absolute top-1/2 right-3 transform -translate-y-1/2 bg-transparent border-none cursor-pointer"
+                            className="absolute bottom-[13px] right-3 bg-transparent border-none cursor-pointer"
                         >
                             <img
                                 src={
