@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import prisma from '../../../utils/prismaClient';
+import { prisma } from '../../utils/prismaClient';
 import bcrypt from 'bcryptjs';
 
 export async function POST(request: Request) {

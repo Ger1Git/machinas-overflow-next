@@ -34,46 +34,19 @@ const RegisterPage = () => {
     const { mutate: handleRegister, isLoading } = useMutation({
         mutationKey: ['register'],
         mutationFn: async () => {
-            try {
-                const response = await axios.post('/api/auth/register', {
-                    email,
-                    username,
-                    password,
-                    fullName: name
-                });
+            const response = await axios.post('/api/auth/register', {
+                email,
+                username,
+                password,
+                fullName: name
+            });
 
-                return response.data;
-            } catch (error) {
-                const errorMessage =
-                    error.response?.data?.message ||
-                    'Registration failed. Please try again.';
-
-                switch (true) {
-                    case errorMessage?.includes('Username'):
-                        setFocusOn('username');
-                        usernameRef.current?.focus();
-                        break;
-                    case errorMessage?.includes('Email'):
-                        setFocusOn('email');
-                        emailRef.current?.focus();
-                        break;
-                    case errorMessage?.includes('Password'):
-                        setFocusOn('password');
-                        passwordRef.current?.focus();
-                        break;
-                    default:
-                        setFocusOn('name');
-                        nameRef.current?.focus();
-                        break;
-                }
-
-                toast.error(errorMessage);
-            }
+            return response.data;
         },
         onSuccess: (data) => {
             const loginResult = signIn('credentials', {
                 redirect: false,
-                email,
+                usernameOrEmail: email,
                 password
             });
 
@@ -84,6 +57,32 @@ const RegisterPage = () => {
                     router.push('/');
                 }
             });
+        },
+        onError: (error) => {
+            const errorMessage =
+                error.response?.data?.message ||
+                'Registration failed. Please try again.';
+
+            switch (true) {
+                case errorMessage?.includes('Username'):
+                    setFocusOn('username');
+                    usernameRef.current?.focus();
+                    break;
+                case errorMessage?.includes('Email'):
+                    setFocusOn('email');
+                    emailRef.current?.focus();
+                    break;
+                case errorMessage?.includes('Password'):
+                    setFocusOn('password');
+                    passwordRef.current?.focus();
+                    break;
+                default:
+                    setFocusOn('name');
+                    nameRef.current?.focus();
+                    break;
+            }
+
+            toast.error(errorMessage);
         }
     });
 

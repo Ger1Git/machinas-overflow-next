@@ -4,11 +4,14 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { navbarLinks } from '../utils/navbarLinks';
+import { signOut } from 'next-auth/react';
 
 const Navbar = () => {
     const [menuOpen, setMenuOpen] = useState<boolean>(false);
 
-    const handleLogout = () => {};
+    const handleLogout = async () => {
+        await signOut();
+    };
 
     return (
         <div>
