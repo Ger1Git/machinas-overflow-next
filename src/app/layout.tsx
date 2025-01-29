@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from './lib/auth';
+import { authOptions } from '../app/api/auth/[...nextauth]/authOptions';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { Providers } from './providers';

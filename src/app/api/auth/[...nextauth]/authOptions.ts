@@ -1,30 +1,38 @@
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import { PrismaClient } from '@prisma/client';
+import GitHubProviders from 'next-auth/providers/github';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
-
-const prisma = new PrismaClient();
+import prisma from '../../utils/prismaClient';
 
 export const authOptions = {
     adapter: PrismaAdapter(prisma),
     providers: [
+        GitHubProviders({
+            clientId: process.env.GITHUB_CLIENT_ID as string,
+            clientSecret: process.env.GITHUB_CLIENT_SECRET as string
+        }),
         CredentialsProvider({
             name: 'credentials',
             credentials: {
-                email: { label: 'Email', type: 'text' },
+                usernameOrEmail: { label: 'Email/Username', type: 'text' },
                 password: { label: 'Password', type: 'password' }
             },
 
             async authorize(credentials) {
-                const { email, password } = credentials ?? {};
+                const { usernameOrEmail, password } = credentials ?? {};
 
-                if (!email || !password) {
+                if (!usernameOrEmail || !password) {
                     return null;
                 }
 
                 try {
-                    const user = await prisma.user.findUnique({
-                        where: { email }
+                    const user = await prisma.user.findFirst({
+                        where: {
+                            OR: [
+                                { email: usernameOrEmail },
+                                { username: usernameOrEmail }
+                            ]
+                        }
                     });
 
                     if (!user) {
@@ -42,9 +50,9 @@ export const authOptions = {
 
                     return {
                         id: user.id,
+                        username: user.username,
                         email: user.email,
-                        name: user.name,
-                        username: user.username
+                        name: user.name
                     };
                 } catch (error) {
                     console.log('Error authorizing user: ', error);
