@@ -61,6 +61,18 @@ export const authOptions = {
             }
         })
     ],
+    callbacks: {
+        jwt: async ({ token, user }) => {
+            if (user) {
+                token.user = user;
+            }
+            return token;
+        },
+        session: async ({ session, token }) => {
+            session.user = token.user;
+            return session;
+        }
+    },
     session: {
         strategy: 'jwt' as const
     },

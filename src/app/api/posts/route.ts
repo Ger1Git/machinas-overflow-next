@@ -13,15 +13,26 @@ export async function GET() {
     }
 
     try {
-        const users = await prisma.user.findMany();
+        const posts = await prisma.post.findMany({
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        email: true,
+                        name: true,
+                        username: true
+                    }
+                }
+            }
+        });
 
-        return new Response(JSON.stringify({ users }), {
+        return new Response(JSON.stringify({ posts }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' }
         });
     } catch (error) {
         return new Response(
-            JSON.stringify({ error: `Failed to fetch users. ${error}` }),
+            JSON.stringify({ error: `Failed to fetch posts. ${error}` }),
             {
                 status: 500,
                 headers: { 'Content-Type': 'application/json' }

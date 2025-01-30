@@ -36,7 +36,9 @@ export default async function RootLayout({
             >
                 <Providers session={session}>
                     <Navbar />
-                    <main className="flex-1 flex">{children}</main>
+                    <main className="flex-1 flex justify-center py-4">
+                        {children}
+                    </main>
                     <Footer />
                 </Providers>
             </body>

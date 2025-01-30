@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Fragment } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { navbarLinks } from '../utils/navbarLinks';
@@ -36,54 +36,62 @@ const Navbar = () => {
                 </Link>
 
                 {session && (
-                    <div className="flex space-x-4 p-4">
-                        {navbarLinks.map((link, index) => (
-                            <>
-                                {!link.isButton && (
-                                    <Link
-                                        href={link.href}
-                                        key={index}
-                                        className="text-white hover:text-gray-200 flex gap-2 items-center"
-                                    >
-                                        <Image
-                                            src={link.src}
-                                            alt={link.alt}
-                                            width={32}
-                                            height={32}
-                                            className="object-cover group-hover:scale-110 transition-transform"
-                                        />
-                                    </Link>
-                                )}
-                            </>
-                        ))}
+                    <>
+                        <div className="flex-grow flex justify-center mx-4">
+                            <input
+                                type="text"
+                                placeholder="Search..."
+                                className="w-1/4 px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                        <div className="flex space-x-4 p-4">
+                            {navbarLinks.map((link, index) => (
+                                <Fragment key={index}>
+                                    {!link.isButton && (
+                                        <Link
+                                            href={link.href}
+                                            key={index}
+                                            className="text-white hover:text-gray-200 flex gap-2 items-center"
+                                        >
+                                            <Image
+                                                src={link.src}
+                                                alt={link.alt}
+                                                width={32}
+                                                height={32}
+                                                className="object-cover group-hover:scale-110 transition-transform"
+                                            />
+                                        </Link>
+                                    )}
+                                </Fragment>
+                            ))}
+                            <button
+                                onClick={handleLogout}
+                                className="text-white hover:text-gray-200"
+                            >
+                                <Image
+                                    src="/logout.svg"
+                                    alt="Logout"
+                                    width={32}
+                                    height={32}
+                                    className="object-cover group-hover:scale-110 transition-transform"
+                                />
+                            </button>
+                        </div>
                         <button
-                            onClick={handleLogout}
-                            className="text-white hover:text-gray-200"
+                            onClick={() =>
+                                setMenuOpen((prevState) => !prevState)
+                            }
+                            className="block md:hidden text-white"
+                            aria-label="Toggle Menu"
                         >
                             <Image
-                                src="/logout.svg"
-                                alt="Logout"
-                                width={32}
-                                height={32}
-                                className="object-cover group-hover:scale-110 transition-transform"
+                                src="/menu.svg"
+                                alt="Menu"
+                                width={40}
+                                height={40}
                             />
                         </button>
-                    </div>
-                )}
-
-                {session && (
-                    <button
-                        onClick={() => setMenuOpen((prevState) => !prevState)}
-                        className="block md:hidden text-white"
-                        aria-label="Toggle Menu"
-                    >
-                        <Image
-                            src="/menu.svg"
-                            alt="Menu"
-                            width={40}
-                            height={40}
-                        />
-                    </button>
+                    </>
                 )}
             </div>
 
